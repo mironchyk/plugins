@@ -189,29 +189,35 @@ static const int SOURCE_GALLERY = 1;
 }
 
 - (void)checkPhotoAuthorization {
-  PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-  switch (status) {
-    case PHAuthorizationStatusNotDetermined: {
-      [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        if (status == PHAuthorizationStatusAuthorized) {
-          dispatch_async(dispatch_get_main_queue(), ^{
+    //No need to ask permissions for UIImagePickerController since ios 11  because the UIImagePickerController runs in a separate process and therefore for just read-only access you don't need any special permissions.
+    if (@available(iOS 11, *)) {
+        [self showPhotoLibrary];
+    } else {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+        switch (status) {
+          case PHAuthorizationStatusNotDetermined: {
+            [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+              if (status == PHAuthorizationStatusAuthorized) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                  [self showPhotoLibrary];
+                });
+              } else {
+                [self errorNoPhotoAccess:status];
+              }
+            }];
+            break;
+          }
+          case PHAuthorizationStatusAuthorized:
             [self showPhotoLibrary];
-          });
-        } else {
-          [self errorNoPhotoAccess:status];
+            break;
+          case PHAuthorizationStatusDenied:
+          case PHAuthorizationStatusRestricted:
+          default:
+            [self errorNoPhotoAccess:status];
+            break;
         }
-      }];
-      break;
     }
-    case PHAuthorizationStatusAuthorized:
-      [self showPhotoLibrary];
-      break;
-    case PHAuthorizationStatusDenied:
-    case PHAuthorizationStatusRestricted:
-    default:
-      [self errorNoPhotoAccess:status];
-      break;
-  }
+  
 }
 
 - (void)errorNoCameraAccess:(AVAuthorizationStatus)status {
