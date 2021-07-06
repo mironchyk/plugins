@@ -126,8 +126,18 @@ static const int SOURCE_GALLERY = 1;
                                    details:nil]);
         break;
     }
+  } else if ([@"getImageSizeForPath" isEqualToString:call.method]) {
+      NSString *path = call.arguments[@"path"];
+      if (!path) {
+          result([FlutterError errorWithCode:@"invalid_path"
+                                     message:@"Invalid photo source."
+                                     details:nil]);
+          return;
+      }
+      [self handleImageSizeFor:path flutterResult:result];
   } else {
-    result(FlutterMethodNotImplemented);
+      result(FlutterMethodNotImplemented);
+
   }
 }
 
@@ -370,13 +380,14 @@ static const int SOURCE_GALLERY = 1;
   NSString *savedPath = [FLTImagePickerPhotoAssetUtil saveImageWithPickerInfo:info
                                                                         image:image
                                                                  imageQuality:imageQuality];
-  [self handleSavedPath:savedPath];
+  [self handleSavedPath:savedPath ];
 }
 
 - (void)handleSavedPath:(NSString *)path {
   if (!self.result) {
     return;
   }
+
   if (path) {
     self.result(path);
   } else {
@@ -386,6 +397,21 @@ static const int SOURCE_GALLERY = 1;
   }
   self.result = nil;
   _arguments = nil;
+}
+
+- (void)handleImageSizeFor:(NSString *)path flutterResult:(FlutterResult)flutterResult {
+    UIImage *image = [[UIImage alloc]initWithContentsOfFile:path];
+    if (!image) {
+        flutterResult([FlutterError errorWithCode:@"invalid_path"
+                                   message:@"No image found on path."
+                                   details:nil]);
+        return;
+    }
+    NSMutableDictionary *resultDictionary = [[NSMutableDictionary alloc]init];
+    resultDictionary[@"height"] = [NSNumber numberWithFloat:image.size.height];
+    resultDictionary[@"width"] = [NSNumber numberWithFloat:image.size.width];
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:resultDictionary options:NSJSONWritingPrettyPrinted error:nil];
+    flutterResult([[NSString alloc]initWithData:jsonData encoding:NSUTF8StringEncoding]);
 }
 
 @end
