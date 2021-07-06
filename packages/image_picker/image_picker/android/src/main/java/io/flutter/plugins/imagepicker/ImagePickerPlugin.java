@@ -92,6 +92,7 @@ public class ImagePickerPlugin
   }
 
   static final String METHOD_CALL_IMAGE = "pickImage";
+  static final String METHOD_CALL_IMAGE_SIZE = "getImageSizeForPath";
   static final String METHOD_CALL_VIDEO = "pickVideo";
   private static final String METHOD_CALL_RETRIEVE = "retrieve";
   private static final int CAMERA_DEVICE_FRONT = 1;
@@ -301,6 +302,29 @@ public class ImagePickerPlugin
             break;
           default:
             throw new IllegalArgumentException("Invalid image source: " + imageSource);
+        }
+        break;
+      case METHOD_CALL_IMAGE_SIZE:
+        String imagePath = call.argument("path");
+        if (imagePath == null || imagePath.isEmpty()) {
+          result.success(null);
+        } else {
+          try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+
+            BitmapFactory.decodeFile(imagePath, options);
+            int width = options.outWidth;
+            int height = options.outHeight;
+            JSONObject jsonObject = new JSONObject();
+            if (jsonObject != null) {
+              jsonObject.put("width", width);
+              jsonObject.put("height", height);
+            }
+            result.success(jsonObject.toString());
+          } catch (Exception e) {
+            result.success(null);
+          }
         }
         break;
       case METHOD_CALL_VIDEO:

@@ -4,11 +4,10 @@
 
 import 'dart:async';
 
-import 'package:meta/meta.dart' show required;
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-
 import 'package:image_picker_platform_interface/src/method_channel/method_channel_image_picker.dart';
 import 'package:image_picker_platform_interface/src/types/types.dart';
+import 'package:meta/meta.dart' show required;
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 /// The interface that implementations of image_picker must implement.
 ///
@@ -109,8 +108,7 @@ abstract class ImagePickerPlatform extends PlatformInterface {
   /// * [Android Activity Lifecycle](https://developer.android.com/reference/android/app/Activity.html), for more information on MainActivity destruction.
   @Deprecated('Use retrieveLostData instead.')
   Future<LostDataResponse> retrieveLostDataAsDartIoFile() {
-    throw UnimplementedError(
-        'retrieveLostDataAsDartIoFile() has not been implemented.');
+    throw UnimplementedError('retrieveLostDataAsDartIoFile() has not been implemented.');
   }
 
   // Next version of the API.
@@ -149,6 +147,11 @@ abstract class ImagePickerPlatform extends PlatformInterface {
     CameraDevice preferredCameraDevice = CameraDevice.rear,
   }) {
     throw UnimplementedError('pickImage() has not been implemented.');
+  }
+
+  /// Returns a JSON String for image path.
+  Future getImageSize({@required String path}) {
+    throw UnimplementedError('getImageSize() has not been implemented.');
   }
 
   /// Returns a [PickedFile] containing the video that was picked.

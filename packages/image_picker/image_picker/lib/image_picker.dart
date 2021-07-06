@@ -8,7 +8,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 
 export 'package:image_picker_platform_interface/image_picker_platform_interface.dart'
@@ -110,6 +109,13 @@ class ImagePicker {
       imageQuality: imageQuality,
       preferredCameraDevice: preferredCameraDevice,
     );
+  }
+
+  /// Returns a JSON String for image path.
+  Future getImageSize({
+    @required String path,
+  }) {
+    return platform.getImageSize(path: path);
   }
 
   /// Returns a [File] object pointing to the video that was picked.
