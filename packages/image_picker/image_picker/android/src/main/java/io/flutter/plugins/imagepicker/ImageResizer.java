@@ -33,15 +33,17 @@ class ImageResizer {
       @Nullable Double maxWidth,
       @Nullable Double maxHeight,
       @Nullable Integer imageQuality) {
+    boolean shouldScale =
+            maxWidth != null || maxHeight != null || isImageQualityValid(imageQuality);
+    if (!shouldScale) {
+      return imagePath;
+    }
+    
     Bitmap bmp = decodeFile(imagePath);
     if (bmp == null) {
       return null;
     }
-    boolean shouldScale =
-        maxWidth != null || maxHeight != null || isImageQualityValid(imageQuality);
-    if (!shouldScale) {
-      return imagePath;
-    }
+
     try {
       String[] pathParts = imagePath.split("/");
       String imageName = pathParts[pathParts.length - 1];
